@@ -26,16 +26,17 @@ ACTIONS = (0, 1, 2)
 
 def bfs_forward(root_state, show=False):
     q = Queue()
-    for action in ACTIONS:
-        node = Node(root_state.copy(), action, None)
-        q.put(node)
+    # for action in ACTIONS:
+    #     node = Node(root_state.copy(), action, None)
+    #     q.put(node)
+    q.put(Node(root_state.copy(),None,None))
     
     while True:
         if q.empty():
             break
         father_node = q.get()
         father_state = father_node.sta
-        if check_for_score(father_state):
+        if check_for_score(father_state) and father_state!=root_state:
             if show:
                 pygame.draw.rect(SCREEN, (0, 0, 255), \
                         (father_state['x'] - game_state.s_c.x, father_state['y'] - game_state.s_c.y, game_state.player.width, game_state.player.height))
@@ -148,7 +149,7 @@ def check_crash(state):
 while True:
     game_state.player.velMaxY = 20
     game_state.player.AccY = 5
-    game_state.frame_step(ACTIONS[0])
+    # game_state.frame_step(ACTIONS[0])
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -166,10 +167,10 @@ while True:
         time.sleep(0.2)
     actions = []
     while True:
-        actions.append(final_node.act)
         node = final_node.father
         if node is None:
             break
+        actions.append(final_node.act)
         final_node = node
     for i in range(-1, -len(actions)-1, -1):
         # game_state.frame_step(ACTIONS[0])
