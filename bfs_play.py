@@ -1,5 +1,7 @@
 import os.path as osp
 import sys
+
+from sympy import acsc
 dirname = osp.dirname(__file__)
 sys.path.append(dirname)
 
@@ -30,7 +32,7 @@ def bfs_forward(root_state, show=False):
     #     node = Node(root_state.copy(), action, None)
     #     q.put(node)
     q.put(Node(root_state.copy(),None,None))
-    
+    actions = list(ACTIONS[1:])
     while True:
         if q.empty():
             break
@@ -42,7 +44,8 @@ def bfs_forward(root_state, show=False):
                         (father_state['x'] - game_state.s_c.x, father_state['y'] - game_state.s_c.y, game_state.player.width, game_state.player.height))
                 pygame.display.update()
             break
-        for action in ACTIONS[1:]:
+        actions.reverse()
+        for action in actions:
             # father_state = move_forward(father_state, ACTIONS[0])
             new_state = move_forward(father_state, action)
             if check_crash(new_state):
