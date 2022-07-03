@@ -11,7 +11,7 @@ import time
 from amazing_brick.game.wrapped_amazing_brick import \
         GameState, SCREEN
 from collections import namedtuple
-from queue import Queue
+from queue import PriorityQueue
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -19,6 +19,7 @@ parser.add_argument('--display', action='store_true', default=False)
 args = parser.parse_args()
 
 Node = namedtuple("Node", ['sta' , 'act', 'father'])
+Node.__lt__ = lambda x,y:x.sta['y']<y.sta['y']
 
 game_state = GameState(True)
 game_state.player.velMaxY = 20
@@ -27,12 +28,8 @@ game_state.player.AccY = 5
 ACTIONS = (0, 1, 2)
 
 def bfs_forward(root_state, show=False):
-    q = Queue()
-    # for action in ACTIONS:
-    #     node = Node(root_state.copy(), action, None)
-    #     q.put(node)
-    q.put(Node(root_state.copy(),None,None))
-    actions = list(ACTIONS[1:])
+    q = PriorityQueue()
+    q.put(Node(root_state,None,None))
     while True:
         if q.empty():
             break
@@ -44,8 +41,7 @@ def bfs_forward(root_state, show=False):
                         (father_state['x'] - game_state.s_c.x, father_state['y'] - game_state.s_c.y, game_state.player.width, game_state.player.height))
                 pygame.display.update()
             break
-        actions.reverse()
-        for action in actions:
+        for action in ACTIONS:
             # father_state = move_forward(father_state, ACTIONS[0])
             new_state = move_forward(father_state, action)
             if check_crash(new_state):
@@ -58,7 +54,7 @@ def bfs_forward(root_state, show=False):
                     pygame.draw.rect(SCREEN, (100, 100, 100), \
                             (new_state['x'] - game_state.s_c.x, new_state['y'] - game_state.s_c.y, game_state.player.width, game_state.player.height))
                     pygame.display.update()
-                node = Node(new_state, action, father_node)
+                node = Node(new_state.copy(), action, father_node)
                 q.put(node)
     
     return father_node
